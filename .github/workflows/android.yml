@@ -32,12 +32,16 @@ jobs:
 
       - name: Prepare Gradle wrapper JAR (CI-only)
         run: |
+          set -euo pipefail
           WRAPPER_DIR=gradle/wrapper
           mkdir -p "$WRAPPER_DIR"
           if [ ! -f "$WRAPPER_DIR/gradle-wrapper.jar" ]; then
-            echo "Fetching gradle-wrapper.jar (8.7)"
-            curl -fsSL -o "$WRAPPER_DIR/gradle-wrapper.jar" \
-              https://repo1.maven.org/maven2/org/gradle/gradle-wrapper/8.7/gradle-wrapper-8.7.jar
+            echo "Fetching gradle-wrapper.jar (from official Gradle distribution 8.7)"
+            curl -fsSL -o gradle-8.7-bin.zip https://services.gradle.org/distributions/gradle-8.7-bin.zip
+            mkdir -p tmp_gradle
+            unzip -q gradle-8.7-bin.zip "gradle-8.7/lib/plugins/gradle-wrapper-*.jar" -d tmp_gradle
+            mv tmp_gradle/gradle-8.7/lib/plugins/gradle-wrapper-*.jar "$WRAPPER_DIR/gradle-wrapper.jar"
+            rm -rf tmp_gradle gradle-8.7-bin.zip
           fi
 
       - name: Configure Gradle caching
