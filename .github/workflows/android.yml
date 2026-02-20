@@ -22,6 +22,11 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Install Android build tools and platform
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
       - name: Prepare Gradle wrapper JAR (CI-only)
         run: |
           WRAPPER_DIR=gradle/wrapper
@@ -34,6 +39,9 @@ jobs:
 
       - name: Configure Gradle caching
         uses: gradle/actions/setup-gradle@v3
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
       - name: Assemble Debug
         run: ./gradlew :app:assembleDebug --stacktrace
